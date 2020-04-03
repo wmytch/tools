@@ -9,4 +9,7 @@
   ```
 
   我的server端是macos，一番搜索之后，在/etc/ssh/sshd_config文件中增加了一行`Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc`,于是问题解决。然而，一则不能保证将来碰到的server端都允许做这样的修改，如果需要的话，二则当我用qt自带的sftp工具测试连接的时候，并没有做这样的修改，也能正常操作。所以，这里的可能一个是win7系统的ssl库的问题，另一个是botan编译时库选择的问题。这是一个需要解决的问题，不过并不急迫。
+  
 4. 待续
+
+
