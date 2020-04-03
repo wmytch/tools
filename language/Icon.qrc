@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icon/rewind.png</file>
+        <file>icon/finish.png</file>
+        <file>icon/mute.png</file>
+        <file>icon/open.png</file>
+        <file>icon/pause.png</file>
+        <file>icon/play.png</file>
+        <file>icon/record.png</file>
+        <file>icon/save.png</file>
+        <file>icon/sound.png</file>
+        <file>icon/stop.png</file>
+        <file>icon/backward.png</file>
+        <file>icon/forward.png</file>
+    </qresource>
+</RCC>
