@@ -21,6 +21,7 @@ public:
     ~MainWindow();
 
     enum JobCommand {None,RealPath,ListDir};
+    enum RemoteColumn {Name,Size,Type,DateModified};
 private slots:
 
     void on_pbConnect_clicked();
@@ -60,15 +61,15 @@ private:
     QString homeDir{""};
     JobCommand curJob;
 
-    QSsh::SftpChannel::Ptr m_channel;
-    QSsh::SshConnection *m_connection;
+    QSsh::SftpChannel::Ptr m_channel{NULL};
+    QSsh::SshConnection *m_connection{nullptr};
 
     QFileSystemModel *localFileSystem;
-    QItemSelectionModel *localSelection;
 
 
     void initLocalFileTree();
     bool connectToHost(QString remoteHost,int remotePort,QString user,QString password);
+    void jobLog( QSsh::SftpJobId jobId,QString jobName);
 
 };
 #endif // MAINWINDOW_H
