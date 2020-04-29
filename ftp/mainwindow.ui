@@ -20,7 +20,7 @@
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0" colspan="3">
          <widget class="QGroupBox" name="groupBox">
@@ -220,6 +220,9 @@
              <property name="dragEnabled">
               <bool>true</bool>
              </property>
+             <property name="dragDropOverwriteMode">
+              <bool>true</bool>
+             </property>
              <property name="dragDropMode">
               <enum>QAbstractItemView::DragDrop</enum>
              </property>
@@ -228,6 +231,9 @@
              </property>
              <property name="selectionMode">
               <enum>QAbstractItemView::ExtendedSelection</enum>
+             </property>
+             <property name="sortingEnabled">
+              <bool>true</bool>
              </property>
              <column>
               <property name="text">
