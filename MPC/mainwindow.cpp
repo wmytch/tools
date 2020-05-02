@@ -11,11 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
     statusLabel->setMinimumWidth(150);
     ui->statusbar->addWidget(statusLabel);
 
-    connect(this,SIGNAL(tcpConnect(QString,int,int)),&tcpClient,SLOT(onTcpConnect(QString,int,int)));
-    connect(this,SIGNAL(tcpDisconnect()),&tcpClient,SLOT(onTcpDisconnect()));
 
-    connect(&tcpClient,SIGNAL(tcpConnected(bool)),this,SLOT(onTcpConnected(bool)));
-    connect(&tcpClient,SIGNAL(tcpReturned(QString)),this,SLOT(onTcpReturned(QString)));
 }
 
 MainWindow::~MainWindow()
@@ -31,14 +27,23 @@ void MainWindow::onTcpConnected(bool connected)
         curTcpState=TcpState::connected;
         ui->btnTcpConnect->setText("断开");
     }
-    else
+
+    statusLabel->setText(QString("Total links:%1  successed links:%2").arg(ui->spinLinkThread->value()).arg(linked));
+}
+
+void MainWindow::onTcpDisconnected()
+{
+    unlinked++;
+    if(unlinked==linked)  //I know this condition is problematic,but it is trival as a client.
     {
-        linked--;
-        if(linked<0) linked=0;
         curTcpState=TcpState::disconnected;
         ui->btnTcpConnect->setText("连接");
+        ui->btnTcpSend->setEnabled(true);
+        delete tcpClient;
+        tcpClient=nullptr;
     }
-    statusLabel->setText(QString("Total links:%1  successed links:%2").arg(ui->spinLinkThread->value()).arg(linked));
+    statusLabel->setText(QString("Total links:%1 unlinked:%2")
+                         .arg(ui->spinLinkThread->value()).arg(unlinked));
 }
 
 void MainWindow::onTcpReturned(QString info)
@@ -53,12 +58,25 @@ void MainWindow::on_btnTcpConnect_clicked()
         QString addr=ui->editHostIP->text().trimmed();
         int port=ui->editHostPort->text().trimmed().toInt();
         int linkThread=ui->spinLinkThread->text().trimmed().toInt();
+
+        tcpClient=new TcpClient;
+        connect(this,SIGNAL(tcpConnectTo(QString,int,int)),tcpClient,SLOT(onTcpConnectTo(QString,int,int)));
+        connect(this,SIGNAL(tcpDisconnect()),tcpClient,SLOT(onTcpDisconnect()));
+
+        connect(tcpClient,SIGNAL(tcpConnected(bool)),this,SLOT(onTcpConnected(bool)));
+        connect(tcpClient,SIGNAL(tcpDisconnected()),this,SLOT(onTcpDisconnected()));
+        connect(tcpClient,SIGNAL(tcpReturned(QString)),this,SLOT(onTcpReturned(QString)));
+
+
         linked=0;
         statusLabel->clear();
-        emit tcpConnect(addr,port,linkThread);
+
+        emit tcpConnectTo(addr,port,linkThread);
     }
     else
     {
+        unlinked=0;
+        ui->btnTcpSend->setEnabled(false);
         emit tcpDisconnect();
     }
 }

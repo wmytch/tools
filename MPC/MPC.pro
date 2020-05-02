@@ -19,12 +19,12 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     tcpclient.cpp \
-    tcpthreads.cpp
+    tcpworker.cpp
 
 HEADERS += \
     mainwindow.h \
     tcpclient.h \
-    tcpthreads.h
+    tcpworker.h
 
 FORMS += \
     mainwindow.ui

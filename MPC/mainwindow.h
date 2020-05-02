@@ -20,17 +20,19 @@ public:
 
 //the tcp client related members
 private:
-    TcpClient tcpClient;
+    TcpClient *tcpClient{nullptr};
     enum TcpState {connected,disconnected};
     TcpState curTcpState{TcpState::disconnected};
     int linked=0;
+    int unlinked=0;
 signals:
-    void tcpConnect(QString addr,int port,int links);
+    void tcpConnectTo(QString addr,int port,int links);
     void tcpDisconnect();
     void tcpSend(QString data);
     void tcpSend(size_t packageSize,int sendTimes);
 public slots:
     void onTcpConnected(bool connected);
+    void onTcpDisconnected();
     void onTcpReturned(QString info);
 private slots:
     void on_btnTcpConnect_clicked();

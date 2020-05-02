@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>804</width>
+    <width>858</width>
     <height>600</height>
    </rect>
   </property>
@@ -127,10 +127,21 @@
                </widget>
               </item>
               <item row="1" column="1" colspan="3">
-               <widget class="QLineEdit" name="editHostPort"/>
+               <widget class="QLineEdit" name="editHostPort">
+                <property name="text">
+                 <string>23333</string>
+                </property>
+                <property name="maxLength">
+                 <number>65535</number>
+                </property>
+               </widget>
               </item>
               <item row="0" column="1" colspan="3">
-               <widget class="QLineEdit" name="editHostIP"/>
+               <widget class="QLineEdit" name="editHostIP">
+                <property name="text">
+                 <string>192.168.211.103</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
@@ -329,7 +340,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>804</width>
+     <width>858</width>
      <height>21</height>
     </rect>
    </property>
@@ -350,7 +361,7 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>
