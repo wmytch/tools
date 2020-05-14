@@ -21,21 +21,24 @@ public:
 //the tcp client related members
 private:
     TcpClient *tcpClient{nullptr};
-    enum TcpState {connected,disconnected};
+    enum TcpState {connecting,connected,disconnecting,disconnected};
     TcpState curTcpState{TcpState::disconnected};
     int linked=0;
     int unlinked=0;
 signals:
-    void tcpConnectTo(QString addr,int port,int links);
-    void tcpDisconnect();
-    void tcpSend(QString data);
+    void tcpConnectToHost(const QString &addr,int port,int links);
+    void tcpDisconnectFromHost();
+    void tcpSend(const QString &data);
     void tcpSend(size_t packageSize,int sendTimes);
 public slots:
-    void onTcpConnected(bool connected);
-    void onTcpDisconnected();
-    void onTcpReturned(QString info);
+    void onTcpConnected(int linked);
+    void onTcpDisconnected(int linked);
+    void onTcpError(const QString &info,int linked);
+    void onTcpReturned(const QString &info);
 private slots:
     void on_btnTcpConnect_clicked();
+
+    void on_btnTcpSend_clicked();
 
 private:
     Ui::MainWindow *ui;

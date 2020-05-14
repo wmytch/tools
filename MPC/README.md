@@ -2,4 +2,6 @@
 
 2. 2020/5/2 最主要的是解决了qt中使用moveToThread引发的一个常见问题`QObject: Cannot create children for a parent that is in a different thread`。具体参见tcpworker.cpp中TcpWorker的构造函数，
 
+3. 2020/5/14 改变了一下各个对象之间传递的信号内容，主要是MainWindow和TcpClient之间
+
     ​    

@@ -10,8 +10,6 @@ MainWindow::MainWindow(QWidget *parent)
     statusLabel=new QLabel;
     statusLabel->setMinimumWidth(150);
     ui->statusbar->addWidget(statusLabel);
-
-
 }
 
 MainWindow::~MainWindow()
@@ -19,64 +17,106 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::onTcpConnected(bool connected)
+void MainWindow::onTcpConnected(int linked)
 {
-    if(connected)
-    {
-        linked++;
-        curTcpState=TcpState::connected;
-        ui->btnTcpConnect->setText("断开");
-    }
 
-    statusLabel->setText(QString("Total links:%1  successed links:%2").arg(ui->spinLinkThread->value()).arg(linked));
+    curTcpState=TcpState::connected;
+    ui->btnTcpSend->setEnabled(true);
+    ui->btnTcpConnect->setEnabled(true);
+    ui->btnTcpConnect->setText("断开");
+    statusLabel->setText(QString("Total links:%1 linked:%2").arg(ui->spinLinkThread->value()).arg(linked));
 }
 
-void MainWindow::onTcpDisconnected()
+void MainWindow::onTcpDisconnected(int linked)
 {
-    unlinked++;
-    if(unlinked==linked)  //I know this condition is problematic,but it is trival as a client.
+    statusLabel->setText(QString("Total links:%1 linked:%2 ")
+                         .arg(ui->spinLinkThread->value()).arg(linked));
+    if(linked==0)
     {
         curTcpState=TcpState::disconnected;
         ui->btnTcpConnect->setText("连接");
-        ui->btnTcpSend->setEnabled(true);
+        ui->btnTcpConnect->setEnabled(true);
+        ui->btnTcpSend->setEnabled(false);
+        if(tcpClient)
+        {
+            delete tcpClient;
+            tcpClient=nullptr;
+        }
+    }
+
+}
+
+void MainWindow::onTcpError(const QString &info,int linked)
+{
+
+    statusLabel->setText(QString("Total links:%1 linked:%2 ")
+                         .arg(ui->spinLinkThread->value()).arg(linked));
+    ui->plainTextEdit->appendPlainText(info);
+    if(tcpClient&&linked==0)
+    {
+        curTcpState=TcpState::disconnected;
+        ui->btnTcpConnect->setText("连接");
+        ui->btnTcpConnect->setEnabled(true);
+        ui->btnTcpSend->setEnabled(false);
         delete tcpClient;
         tcpClient=nullptr;
     }
-    statusLabel->setText(QString("Total links:%1 unlinked:%2")
-                         .arg(ui->spinLinkThread->value()).arg(unlinked));
 }
 
-void MainWindow::onTcpReturned(QString info)
+void MainWindow::onTcpReturned(const QString &info)
 {
-    ui->plainTextEdit->appendPlainText(info);
+    ui->plainTextEdit->appendPlainText("Recv:"+info.trimmed());
 }
 
 void MainWindow::on_btnTcpConnect_clicked()
 {
-    if(curTcpState==TcpState::disconnected)
+    switch(curTcpState)
     {
-        QString addr=ui->editHostIP->text().trimmed();
-        int port=ui->editHostPort->text().trimmed().toInt();
-        int linkThread=ui->spinLinkThread->text().trimmed().toInt();
+    case TcpState::disconnected:
+    {
+        if(tcpClient)
+            delete tcpClient;
 
         tcpClient=new TcpClient;
-        connect(this,SIGNAL(tcpConnectTo(QString,int,int)),tcpClient,SLOT(onTcpConnectTo(QString,int,int)));
-        connect(this,SIGNAL(tcpDisconnect()),tcpClient,SLOT(onTcpDisconnect()));
 
-        connect(tcpClient,SIGNAL(tcpConnected(bool)),this,SLOT(onTcpConnected(bool)));
-        connect(tcpClient,SIGNAL(tcpDisconnected()),this,SLOT(onTcpDisconnected()));
-        connect(tcpClient,SIGNAL(tcpReturned(QString)),this,SLOT(onTcpReturned(QString)));
+        connect(this,&MainWindow::tcpConnectToHost,tcpClient,&TcpClient::onConnectToHost);
+        connect(this,&MainWindow::tcpDisconnectFromHost,tcpClient,&TcpClient::onDisconnectFromHost);
+        connect(this,SIGNAL(tcpSend(QString)),tcpClient,SLOT(onSend(QString)));
+
+        connect(tcpClient,&TcpClient::tcpConnected,this,&MainWindow::onTcpConnected);
+        connect(tcpClient,&TcpClient::tcpDisconnected,this,&MainWindow::onTcpDisconnected);
+        connect(tcpClient,&TcpClient::tcpError,this,&MainWindow::onTcpError);
+        connect(tcpClient,&TcpClient::tcpReturned,this,&MainWindow::onTcpReturned);
+
+        ui->btnTcpConnect->setEnabled(false);
+        statusLabel->setText("Connecting...");
+        ui->plainTextEdit->clear();
 
 
-        linked=0;
-        statusLabel->clear();
-
-        emit tcpConnectTo(addr,port,linkThread);
+        QString addr=ui->editHostIP->text().trimmed();
+        int port=ui->editHostPort->text().trimmed().toInt();
+        int links=ui->spinLinkThread->text().trimmed().toInt();
+        curTcpState=TcpState::connecting;
+        emit tcpConnectToHost(addr,port,links);
     }
-    else
+        break;
+    case TcpState::connected:
     {
-        unlinked=0;
         ui->btnTcpSend->setEnabled(false);
-        emit tcpDisconnect();
+        curTcpState=TcpState::disconnecting;
+        emit tcpDisconnectFromHost();
+    }
+        break;
+    default:
+        break;
+    }
+}
+
+void MainWindow::on_btnTcpSend_clicked()
+{
+    if(ui->rbText->isChecked())
+    {
+        ui->plainTextEdit->appendPlainText("Send:"+ui->editTextData->text());
+        emit tcpSend(ui->editTextData->text());
     }
 }

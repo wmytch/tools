@@ -10,24 +10,28 @@ public:
     TcpClient();
     ~TcpClient();
 
+private:
     QVector<QThread*> tcpThreads;
+    int linked{0};
 
 signals:
-    void tcpConnected(bool result);
-    void tcpDisconnected();
-    void tcpReturned(QString info);
+    void tcpConnected(int linked);
+    void tcpDisconnected(int linked);
+    void tcpError(const QString &info,int linked);
+    void tcpSend(const QString &data);
+    void tcpSend(size_t packageSize,int sendTimes);
+    void tcpReturned(const QString &info);
 
-    void tcpConnectTo(QString addr,int port);
-    void tcpDisconnectFrom();
+    void connectToHost(const QString &addr,int port);
+    void disconnectFromHost();
 
 public slots:
-    void onTcpConnectTo(QString addr,int port,int links);
-    void onTcpDisconnect();
-    void onTcpSend(QString data);
-    void onTcpSend(size_t packageSize,int sendTimes);
-    void onTcpReturned(QString info);
+    void onConnectToHost(const QString &addr,int port,int links);
+    void onDisconnectFromHost();
+    void onSend(const QString &data);
+    void onSend(size_t packageSize,int sendTimes);
+    void onReturned(const QString &info);
 
-    void onWorkerTcpConnected(bool result);
 };
 
 #endif // TCPCLIENT_H
