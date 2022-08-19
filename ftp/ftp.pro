@@ -16,21 +16,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    logindialog.cpp \
     main.cpp \
-    mainwindow.cpp
+    src/logindialog.cpp \
+    src/mainwindow.cpp
 
-INCLUDEPATH += C:\QSsh\src\libs\ssh
+INCLUDEPATH += include/
 
 HEADERS += \
-    logindialog.h \
-    mainwindow.h
+    include/logindialog.h \
+    include/mainwindow.h
 
-LIBS+= -LC:\QSsh\build\lib -lbotan-2 -lqssh
+#LIBS+= -L./lib -lbotan-2  -L./lib -lqssh
 
 FORMS += \
-    logindialog.ui \
-    mainwindow.ui
+    res/logindialog.ui \
+    res/mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -38,4 +38,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    Icon.qrc
+    res/Icon.qrc
+
+DISTFILES += \
+    res/parent.png \
+    res/up.png

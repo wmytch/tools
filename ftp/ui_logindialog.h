@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'logindialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.14.0
+** Created by: Qt User Interface Compiler version 6.3.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -98,7 +98,7 @@ public:
 
 
         retranslateUi(LoginDialog);
-        QObject::connect(btnCancel, SIGNAL(clicked()), LoginDialog, SLOT(reject()));
+        QObject::connect(btnCancel, &QPushButton::clicked, LoginDialog, qOverload<>(&QDialog::reject));
 
         QMetaObject::connectSlotsByName(LoginDialog);
     } // setupUi
