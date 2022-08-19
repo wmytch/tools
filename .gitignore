@@ -1,2 +1,11 @@
 
 .DS_Store
+*.idx
+*.exe
+*.o
+ftp/debug/moc_mainwindow.cpp
+ftp/.qtc_clangd/compile_commands.json
+ftp/debug/moc_logindialog.cpp
+ftp/debug/moc_predefs.h
+ftp/debug/qrc_Icon.cpp
+ftp/ftp.pro.user.c82afa3
