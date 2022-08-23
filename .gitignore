@@ -14,3 +14,13 @@ ftp/release/moc_logindialog.cpp
 ftp/release/moc_mainwindow.cpp
 ftp/release/moc_predefs.h
 ftp/release/qrc_Icon.cpp
+ftp/ui_logindialog.h
+ftp/ui_mainwindow.h
+ftp/libssll/libssl.dll
+ftp/libssll/libcrypto.dll
+ftp/libssll/libcrypto.a
+ftp/libssll/libssl.a
+ftp/debug/libssl/libssl.dll
+ftp/debug/libssl/libssl.a
+ftp/debug/libssl/libcrypto.dll
+ftp/debug/libssl/libcrypto.a

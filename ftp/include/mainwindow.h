@@ -24,7 +24,6 @@ public:
     enum RemoteColumn {Name,Size,Type,DateModified};
 private slots:
 
-    void on_pbConnect_clicked();
 
     void onConnected();
 //    void onConnectionError(QSsh::SshError err);
@@ -34,7 +33,7 @@ private slots:
 //    void onDataAvailable(QSsh::SftpJobId,const QString&);
 //    void onFileInfoAvailable(QSsh::SftpJobId, const QList<QSsh::SftpFileInfo> &);
 
-
+    void on_pbConnect_clicked();
 //    void on_cbLocalPath_editTextChanged(const QString &arg1);
     void on_cbLocalPath_currentIndexChanged(const QString &arg1);
 
@@ -61,15 +60,11 @@ private:
     QString homeDir{""};
     JobCommand curJob;
 
-//    QSsh::SftpChannel::Ptr m_channel{NULL};
-//    QSsh::SshConnection *m_connection{nullptr};
-
     QFileSystemModel *localFileSystem;
 
 
     void initLocalFileTree();
     bool connectToHost(QString remoteHost,int remotePort,QString user,QString password);
-//    void jobLog( QSsh::SftpJobId jobId,QString jobName);
 
 };
 #endif // MAINWINDOW_H

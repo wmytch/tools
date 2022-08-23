@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QMessageBox>
 #include <QDir>
 #include <QDateTime>
 
@@ -70,34 +69,18 @@ void MainWindow::on_pbConnect_clicked()
 
 bool MainWindow::connectToHost(QString remoteHost,int remotePort,QString user,QString password)
 {
-//    if(m_connection)
-//    {
-//        ui->operationLog->appendPlainText("SFTP: Disconnected ...");
-//        m_connection->closeAllChannels();
-//        delete m_connection; //containning disconnect and disconnectFromHost operation
-//        m_connection=nullptr;
-//    }
-//    QSsh::SshConnectionParameters params;
-//    params.host = remoteHost;
-//    params.userName = user;
-//    params.password = password;
-//    params.authenticationType = QSsh::SshConnectionParameters::AuthenticationByPassword;
-//    params.timeout = 30;
-//    params.port = remotePort;
+    QSslSocket *socket = new QSslSocket(this);
+    connect(socket, SIGNAL(encrypted()), this, SLOT(onConnected()));
 
-//    m_connection = new QSsh::SshConnection(params, this); // TODO free this pointer!
-//    connect(m_connection, SIGNAL(connected()), SLOT(onConnected()));
-//    connect(m_connection, SIGNAL(error(QSsh::SshError)), SLOT(onConnectionError(QSsh::SshError)));
+    socket->connectToHostEncrypted(remoteHost, remotePort);
 
-//    ui->operationLog->appendPlainText("SFTP: Connecting ...");
-//    m_connection->connectToHost();
     return true;
 }
 
 void MainWindow::onConnected()
 {
-//    ui->operationLog->appendPlainText("SFTP: Connected");
-//    ui->operationLog->appendPlainText("SFTP: Creating SFTP channel...");
+    ui->operationLog->appendPlainText("SFTP: Connected");
+    ui->operationLog->appendPlainText("SFTP: Creating SFTP channel...");
 
 //    m_channel = m_connection->createSftpChannel();
 

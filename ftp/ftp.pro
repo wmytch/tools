@@ -22,11 +22,12 @@ SOURCES += \
 
 INCLUDEPATH += include/
 
+
 HEADERS += \
     include/logindialog.h \
     include/mainwindow.h
 
-#LIBS+= ./lib/libcrypto.lib ./lib/libssl.lib
+#LIBS+= ./lib/libcrypto.a ./lib/libssl.a
 LIBS += -L./lib -lcrypto -L./lib -lssl
 
 FORMS += \
