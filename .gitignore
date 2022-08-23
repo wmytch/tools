@@ -9,3 +9,8 @@ ftp/debug/moc_logindialog.cpp
 ftp/debug/moc_predefs.h
 ftp/debug/qrc_Icon.cpp
 ftp/ftp.pro.user.c82afa3
+ftp/ftp.pro.user
+ftp/release/moc_logindialog.cpp
+ftp/release/moc_mainwindow.cpp
+ftp/release/moc_predefs.h
+ftp/release/qrc_Icon.cpp

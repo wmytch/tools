@@ -1,10 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-//#include "logindialog.h"
 #include <QMessageBox>
 #include <QDir>
 #include <QDateTime>
-//#include "sftpdefs.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

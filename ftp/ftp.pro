@@ -26,7 +26,8 @@ HEADERS += \
     include/logindialog.h \
     include/mainwindow.h
 
-#LIBS+= -L./lib -lbotan-2  -L./lib -lqssh
+#LIBS+= ./lib/libcrypto.lib ./lib/libssl.lib
+LIBS += -L./lib -lcrypto -L./lib -lssl
 
 FORMS += \
     res/logindialog.ui \

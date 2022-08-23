@@ -5,8 +5,8 @@
 #include <QFileSystemModel>
 #include <QKeyEvent>
 #include <QTreeWidgetItem>
-//#include "sftpchannel.h"
-//#include "sshconnection.h"
+#include <QSslSocket>
+#include <QMessageBox>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
