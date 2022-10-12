@@ -41,6 +41,38 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="3">
+            <widget class="QSpinBox" name="sbRemoteHostPort">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximum">
+              <number>65535</number>
+             </property>
+             <property name="value">
+              <number>22</number>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="7">
+            <widget class="QLineEdit" name="editPassword">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>:::::::</string>
+             </property>
+             <property name="echoMode">
+              <enum>QLineEdit::Password</enum>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="1" colspan="2">
             <widget class="QComboBox" name="cbRemoteHostIP">
              <property name="sizePolicy">
@@ -63,35 +95,6 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="3">
-            <widget class="QSpinBox" name="sbRemoteHostPort">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="maximum">
-              <number>65535</number>
-             </property>
-             <property name="value">
-              <number>22</number>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="4">
-            <widget class="QLabel" name="label_2">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>用户</string>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="5">
             <widget class="QLineEdit" name="editUser">
              <property name="sizePolicy">
@@ -101,7 +104,7 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>mac</string>
+              <string>Mac</string>
              </property>
             </widget>
            </item>
@@ -118,22 +121,6 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="7">
-            <widget class="QLineEdit" name="editPassword">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>:::::::</string>
-             </property>
-             <property name="echoMode">
-              <enum>QLineEdit::Password</enum>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="8">
             <widget class="QPushButton" name="pbConnect">
              <property name="sizePolicy">
@@ -147,23 +134,16 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="QRadioButton" name="rbFtp">
+           <item row="0" column="4">
+            <widget class="QLabel" name="label_2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="text">
-              <string>ftp</string>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <widget class="QRadioButton" name="rbSftp">
-             <property name="text">
-              <string>sftp</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
+              <string>用户</string>
              </property>
             </widget>
            </item>
@@ -191,6 +171,13 @@
            <property name="sizeConstraint">
             <enum>QLayout::SetDefaultConstraint</enum>
            </property>
+           <item row="0" column="0">
+            <widget class="QComboBox" name="cbRemotePath">
+             <property name="editable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="1">
             <widget class="QToolButton" name="toolButton_2">
              <property name="text">
@@ -199,13 +186,6 @@
              <property name="icon">
               <iconset resource="Icon.qrc">
                <normaloff>:/up.png</normaloff>:/up.png</iconset>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QComboBox" name="cbRemotePath">
-             <property name="editable">
-              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -232,39 +212,75 @@
              <property name="selectionMode">
               <enum>QAbstractItemView::ExtendedSelection</enum>
              </property>
+             <property name="indentation">
+              <number>0</number>
+             </property>
              <property name="sortingEnabled">
               <bool>true</bool>
              </property>
-             <column>
-              <property name="text">
-               <string>Name</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Size</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignLeading|AlignVCenter</set>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Type</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Date Modified</string>
-              </property>
-             </column>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QCheckBox" name="remoteHideFile">
-             <property name="text">
-              <string>不显示隐藏文件</string>
+             <property name="headerHidden">
+              <bool>false</bool>
              </property>
+             <property name="columnCount">
+              <number>9</number>
+             </property>
+             <attribute name="headerVisible">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="headerCascadingSectionResizes">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="headerMinimumSectionSize">
+              <number>1</number>
+             </attribute>
+             <attribute name="headerDefaultSectionSize">
+              <number>60</number>
+             </attribute>
+             <column>
+              <property name="text">
+               <string/>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string/>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string/>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string/>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string/>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string/>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string/>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string/>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string/>
+              </property>
+             </column>
             </widget>
            </item>
           </layout>
@@ -291,7 +307,7 @@
           <item>
            <widget class="QPushButton" name="pbDownload">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -307,7 +323,7 @@
           <item>
            <widget class="QPushButton" name="pbUpload">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -399,13 +415,6 @@
              <property name="icon">
               <iconset resource="Icon.qrc">
                <normaloff>:/up.png</normaloff>:/up.png</iconset>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QCheckBox" name="localHideFile">
-             <property name="text">
-              <string>不显示隐藏文件</string>
              </property>
             </widget>
            </item>

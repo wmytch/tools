@@ -5,8 +5,10 @@
 #include <QFileSystemModel>
 #include <QKeyEvent>
 #include <QTreeWidgetItem>
-#include <QSslSocket>
 #include <QMessageBox>
+
+#include "common.h"
+#include "sftpclient.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,18 +22,25 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    enum JobCommand {None,RealPath,ListDir};
-    enum RemoteColumn {Name,Size,Type,DateModified};
+signals:
+    void connectToServer();
+    void listServerDir(const QString& path);
+    void downloadDir(const QString &dir,const QString &localPath);
+    void downloadFile(const QString &file,const QString &localPath);
+    void uploadDir(const QString &fullPath,const QString &dir,const QString &remotePath);
+    void uploadFile(const QString &fullPath,const QString &file,const QString &remotePath);
+//    void realServerPath(QString& path);
+
+private:
+    SftpClient *ftpClient{nullptr};
+
+    void operationLog(const QString &info);
+
 private slots:
 
-
-    void onConnected();
-//    void onConnectionError(QSsh::SshError err);
-    void onChannelInitialized();
-//    void onChannelError(const QString &errString);
-//    void onOpfinished(QSsh::SftpJobId,const QString&);
-//    void onDataAvailable(QSsh::SftpJobId,const QString&);
-//    void onFileInfoAvailable(QSsh::SftpJobId, const QList<QSsh::SftpFileInfo> &);
+    void onFtpServerConnected(QString serverPath);
+    void onNoticed(ClientStatus status,QString info);
+    void onFileList(QHash<QString,QString> &fileList);
 
     void on_pbConnect_clicked();
 //    void on_cbLocalPath_editTextChanged(const QString &arg1);
@@ -58,13 +67,11 @@ private:
     int curRemotePort;
     QString remoteDir;
     QString homeDir{""};
-    JobCommand curJob;
 
     QFileSystemModel *localFileSystem;
 
 
     void initLocalFileTree();
-    bool connectToHost(QString remoteHost,int remotePort,QString user,QString password);
 
 };
 #endif // MAINWINDOW_H

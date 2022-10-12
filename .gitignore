@@ -24,3 +24,6 @@ ftp/debug/libssl/libssl.dll
 ftp/debug/libssl/libssl.a
 ftp/debug/libssl/libcrypto.dll
 ftp/debug/libssl/libcrypto.a
+ftp/debug/moc_sshtest.cpp
+*.stash
+ftp/debug/新建文件夹/libssl.dll.a

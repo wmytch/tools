@@ -1,18 +1,19 @@
-#include "mainwindow.h"
-
 #include <QApplication>
+
+#include "mainwindow.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    if(!QSslSocket::supportsSsl())
+    WSADATA wsadata;
+    int err = WSAStartup(MAKEWORD(2, 0), &wsadata);
+    if(err != 0)
     {
-        QMessageBox::critical(nullptr,"SSL","系统不支持SSL.");
+        QMessageBox::critical(nullptr,"WSAStartup",QString("WSAStartup failed with error: %1").arg(err));
         return -1;
     }
-    qDebug() << "build-time OpenSSL version:" <<QSslSocket::sslLibraryBuildVersionString();
-    qDebug() << "run-time OpenSSL version:" << QSslSocket::sslLibraryVersionString();
+
     MainWindow w;
     w.show();
     return a.exec();

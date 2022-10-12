@@ -2,19 +2,27 @@
 #include "ui_mainwindow.h"
 #include <QDir>
 #include <QDateTime>
+//#include "sftpclient.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    : QMainWindow(parent),ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     initLocalFileTree();
 }
 
+
 MainWindow::~MainWindow()
 {
+    if(ftpClient)
+    {
+        delete ftpClient;
+        ftpClient=nullptr;
+    }
     delete ui;
 }
+
 
 void MainWindow::initLocalFileTree()
 {
@@ -30,6 +38,7 @@ void MainWindow::initLocalFileTree()
 
     ui->cbLocalPath->setInsertPolicy(QComboBox::NoInsert);//ensure no auto insert
 }
+
 
 void MainWindow::on_pbConnect_clicked()
 {
@@ -64,50 +73,126 @@ void MainWindow::on_pbConnect_clicked()
         return;
     }
 
-    connectToHost(curRemoteHost,curRemotePort,curUser,curPassword);
+//    operationLog(QString("connect info:%1@%2:%3").arg(curUser).arg(curRemoteHost).arg(curRemotePort));
+
+    ftpClient=new SftpClient(curRemoteHost,curRemotePort,curUser,curPassword);
+
+    connect(this,&MainWindow::connectToServer,ftpClient,&SftpClient::onConnectToServer);
+
+    connect(ftpClient,&SftpClient::notice,this,&MainWindow::onNoticed);
+    connect(ftpClient,&SftpClient::ftpServerConnected,this,&MainWindow::onFtpServerConnected);
+
+    ui->pbConnect->setEnabled(false);
+    emit connectToServer();
 }
 
-bool MainWindow::connectToHost(QString remoteHost,int remotePort,QString user,QString password)
+
+inline void MainWindow::operationLog(const QString &info)
 {
-    QSslSocket *socket = new QSslSocket(this);
-    connect(socket, SIGNAL(encrypted()), this, SLOT(onConnected()));
-
-    socket->connectToHostEncrypted(remoteHost, remotePort);
-
-    return true;
+    ui->operationLog->appendPlainText("SFTP: "+info);
 }
 
-void MainWindow::onConnected()
+
+void MainWindow::onFtpServerConnected(QString serverPath)
 {
-    ui->operationLog->appendPlainText("SFTP: Connected");
-    ui->operationLog->appendPlainText("SFTP: Creating SFTP channel...");
+    remoteDir=serverPath;
+    homeDir=serverPath;
+    ui->cbRemotePath->setEditText(serverPath);
+//    operationLog("home directory:"+serverPath);
 
-//    m_channel = m_connection->createSftpChannel();
+    connect(this,&MainWindow::listServerDir,ftpClient,&SftpClient::onListServerDir);
+    connect(this,&MainWindow::downloadDir,ftpClient,&SftpClient::onDownloadDir);
+    connect(this,&MainWindow::downloadFile,ftpClient,&SftpClient::onDownloadFile);
+    connect(this,&MainWindow::uploadFile,ftpClient,&SftpClient::onUploadFile);
+    connect(this,&MainWindow::uploadDir,ftpClient,&SftpClient::onUploadDir);
 
-//    if (m_channel) {
-//        connect(m_channel.data(), SIGNAL(initialized()),
-//                SLOT(onChannelInitialized()));
-//        connect(m_channel.data(), SIGNAL(initializationFailed(QString)),
-//                SLOT(onChannelError(QString)));
-//        connect(m_channel.data(), SIGNAL(finished(QSsh::SftpJobId, QString)),
-//                SLOT(onOpfinished(QSsh::SftpJobId, QString)));
-//        connect(m_channel.data(), SIGNAL(dataAvailable(QSsh::SftpJobId, QString)),
-//                SLOT(onDataAvailable(QSsh::SftpJobId, QString)));
-//        connect(m_channel.data(),SIGNAL(fileInfoAvailable(QSsh::SftpJobId, QList<QSsh::SftpFileInfo>)),
-//                SLOT(onFileInfoAvailable(QSsh::SftpJobId, QList<QSsh::SftpFileInfo>)));
+    connect(ftpClient,&SftpClient::fileList,this,&MainWindow::onFileList);
+//    connect(ftpClient,&SftpClient::realServerPath,this,
+//            [=](QString realPath)
+//            {
+//                ui->cbRemotePath->setCurrentText(realPath);
+//                remoteDir=realPath;
+//            }
+//    );
 
-//        m_channel->initialize();
-
-//    } else {
-//        QMessageBox::critical(this,"连接错误", m_connection->errorString());
-//    }
+    emit listServerDir(serverPath);
 }
 
-//void MainWindow::onConnectionError(QSsh::SshError err)
-//{
-//    Q_UNUSED(err)
-//    QMessageBox::critical(this,"连接错误", m_connection->errorString());
-//}
+
+void MainWindow::onNoticed(ClientStatus status,QString info)
+{
+    switch(status)
+    {
+    case ClientStatus::CONNECT_SUCCESS:
+    {
+        operationLog(info);
+    }
+        break;
+    case ClientStatus::CONNECT_FAIL:
+    {
+        operationLog(info);
+        operationLog("Destroy ftp client.");
+        if(ftpClient)
+        {
+            delete ftpClient;
+            ftpClient=nullptr;
+        }
+        ui->pbConnect->setEnabled(true);
+    }
+        break;
+    case ClientStatus::DOWNLOAD_DIR_FAIL:
+    {
+        operationLog("Download dir fail:"+info);
+    }
+        break;
+    case ClientStatus::DOWNLOAD_DIR_SUCCESS:
+    {
+        operationLog("Download dir success:"+info);
+    }
+        break;
+    case ClientStatus::DOWNLOAD_FILE_FAIL:
+    {
+        operationLog("Download file fail:"+info);
+    }
+        break;
+    case ClientStatus::DOWNLOAD_FILE_SUCCESS:
+    {
+        operationLog("Download file sucess:"+info);
+    }
+        break;
+    case ClientStatus::UPLOAD_DIR_FAIL:
+    {
+        operationLog("Upload dir fail:"+info);
+    }
+        break;
+    case ClientStatus::UPLOAD_DIR_SUCCESS:
+    {
+        operationLog("Upload dir success:"+info);
+        emit listServerDir(ui->cbRemotePath->currentText());
+    }
+        break;
+    case ClientStatus::UPLOAD_FILE_FAIL:
+    {
+        operationLog("Upload file fail:"+info);
+    }
+        break;
+    case ClientStatus::UPLOAD_FILE_SUCCESS:
+    {
+        operationLog("Upload file sucess:"+info);
+        emit listServerDir(ui->cbRemotePath->currentText());
+    }
+        break;
+    case ClientStatus::INFO:
+    {
+        operationLog(info);
+    }
+        break;
+    default:
+        operationLog(info);
+        break;
+    }
+}
+
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
@@ -130,90 +215,28 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     }
 }
 
-void MainWindow::onChannelInitialized()
-{
-//    QSsh::SftpJobId jobId=m_channel->realPath(".");
-//    curJob=RealPath;
-//    this->jobLog(jobId,"RealPath");
 
-//    ui->pbUpload->setEnabled(true);
+void MainWindow::onFileList(QHash<QString,QString> &fileList)
+{
+    ui->remoteFileSystem->clear();
+    int columnCount=ui->remoteFileSystem->columnCount();
+//    ui->remoteFileSystem->setHeaderLabel(QString("Total %1").arg(fileList.count()));
+    for(auto &fileInfo:fileList.values())
+    {
+        auto fileItem=new QTreeWidgetItem(ui->remoteFileSystem);
+        auto fileAttr=fileInfo.split(QRegularExpression("\\s+"));
+        int i;
+        for(i=0;i<columnCount-1; i++)
+        {
+            fileItem->setText(i,fileAttr[i]);
+            fileItem->setTextAlignment(i,Qt::AlignLeft|Qt::AlignJustify);
+//            operationLog(fileAttr[i]);
+        }
+        fileItem->setText(i,fileList.key(fileInfo));
+        fileItem->setTextAlignment(i,Qt::AlignLeft|Qt::AlignJustify);
+    }
 }
 
-//void MainWindow::onChannelError(const QString &err)
-//{
-//    ui->operationLog->appendPlainText("Error:"+err);
-//}
-
-//void MainWindow::onOpfinished(QSsh::SftpJobId job, const QString &err)
-//{
-//    ui->operationLog->appendPlainText(QString("Job %1: Finished ").arg(job)+(err.isEmpty()?"OK":err));
-
-//}
-
-//void MainWindow::onDataAvailable(QSsh::SftpJobId job,const QString& data)
-//{
-//    Q_UNUSED(job)
-//    Q_UNUSED(data);
-//}
-
-//void MainWindow::onFileInfoAvailable(QSsh::SftpJobId job, const QList<QSsh::SftpFileInfo> &fileInfoList)
-//{
-//    Q_UNUSED(job)
-//    switch(curJob)
-//    {
-//    case RealPath:
-//    {
-//        remoteDir=fileInfoList[0].name;
-//        if(homeDir.isEmpty())
-//        {
-//            homeDir=remoteDir;
-//        }
-//        ui->cbRemotePath->setEditText(remoteDir);
-//        ui->pbDownload->setEnabled(true);
-
-//        QSsh::SftpJobId jobId=m_channel->listDirectory(remoteDir);
-//        curJob=ListDir;
-//        this->jobLog(jobId,"ListDir "+remoteDir);
-//    }
-//        break;
-//    case ListDir:
-//    {
-//        ui->cbRemotePath->setEditText(remoteDir);
-//        ui->remoteFileSystem->clear();
-//        for(auto fileInfo:fileInfoList)
-//        {
-//            auto fileItem=new QTreeWidgetItem(ui->remoteFileSystem);
-//            fileItem->setText(RemoteColumn::Name,fileInfo.name);
-//            fileItem->setTextAlignment(RemoteColumn::Size,Qt::AlignRight);
-//            fileItem->setText(RemoteColumn::Size,QLocale().toString(fileInfo.size)+" 字节");
-//            QString fileType;
-//            switch(fileInfo.type)
-//            {
-//            case QSsh::FileTypeRegular:
-//                fileType="文件";
-//                break;
-//            case QSsh::FileTypeDirectory:
-//                fileType="目录";
-//                break;
-//            case QSsh::FileTypeOther:
-//                fileType="其它类型";
-//                break;
-//            case QSsh::FileTypeUnknown:
-//                fileType="未知类型";
-//                break;
-//            }
-//            fileItem->setText(RemoteColumn::Type,fileType);
-//            fileItem->setText(RemoteColumn::DateModified,QDateTime::fromSecsSinceEpoch(fileInfo.mtime,Qt::LocalTime).toString("yyyy/MM/dd hh:mm"));
-//        }
-//        curJob=None;
-//    }
-//        break;
-//    case None:
-//        break;
-//    }
-
-
-//}
 void MainWindow::on_cbLocalPath_currentIndexChanged(const QString &arg1)
 {
     auto index=localFileSystem->index(arg1);
@@ -226,6 +249,7 @@ void MainWindow::on_cbLocalPath_currentIndexChanged(const QString &arg1)
         ui->localView->setRootIndex(ui->localView->rootIndex());
     }
 }
+
 
 void MainWindow::on_localView_doubleClicked(const QModelIndex &index)
 {
@@ -242,96 +266,84 @@ void MainWindow::on_localView_doubleClicked(const QModelIndex &index)
 }
 
 
+
 void MainWindow::on_tbLocalParentPath_clicked()
 {
     on_localView_doubleClicked(ui->localView->rootIndex().parent());
 }
 
+
 void MainWindow::on_remoteFileSystem_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
-//    Q_UNUSED(column)
-//    if(item->text(RemoteColumn::Type)=="目录"&&item->text(RemoteColumn::Name)!=".")
-//    {
-//        remoteDir=ui->cbRemotePath->currentText();
-//        if(item->text(RemoteColumn::Name)!="..")
-//        {
-//            remoteDir=remoteDir=="/"?remoteDir+item->text(RemoteColumn::Name):remoteDir+"/"+item->text(RemoteColumn::Name);
-//        }
-//        else
-//        {
-//           auto index=remoteDir.lastIndexOf("/");
-//           remoteDir.remove(index,remoteDir.length()-index+1);
-//           if(remoteDir.isEmpty())  //for remote windows hosts,remote path assured cannot be empty
-//               remoteDir="/";
-//        }
-//        auto jobId=m_channel->listDirectory(remoteDir);
-//        this->jobLog(jobId,"ListDir "+remoteDir);
-//        curJob=ListDir;
-//    }
+        Q_UNUSED(column)
+        if(item->text(0).startsWith('d')&&item->text(item->columnCount()-1)!=".")
+        {
+            remoteDir=ui->cbRemotePath->currentText();
+            if(item->text(item->columnCount()-1)!="..")
+            {
+                remoteDir=remoteDir=="/"?remoteDir+item->text(item->columnCount()-1):remoteDir+"/"+item->text(item->columnCount()-1);
+            }
+            else
+            {
+               auto index=remoteDir.lastIndexOf("/");
+               remoteDir.remove(index,remoteDir.length()-index+1);
+               if(remoteDir.isEmpty())  //for remote windows hosts,remote path assured cannot be empty
+                   remoteDir="/";
+            }
+//            emit realServerPath(remoteDir);
+            ui->cbRemotePath->setCurrentText(remoteDir);
+            emit listServerDir(remoteDir);
+            operationLog(remoteDir);
+        }
 }
+
 
 void MainWindow::on_pbUpload_clicked()
 {
-//    QString target;
-//    QSsh::SftpJobId jobId;
-//    if(remoteDir!="/") //in fact,we can ensure the remoteDir cannot be something like c:/,it only can be c: or something
-//    {
-//        for(auto index:ui->localView->selectionModel()->selectedRows())
-//        {
-//            if(localFileSystem->isDir(index))
-//            {
-//               jobId=m_channel->uploadDir(localFileSystem->filePath(index),remoteDir);
-//               this->jobLog(jobId,"Upload directory local:"+localFileSystem->filePath(index)+" To remote:"+remoteDir);
-//            }
-//            else
-//            {
-//                target=remoteDir+"/"+localFileSystem->fileName(index);
-//                jobId=m_channel->uploadFile(localFileSystem->filePath(index),target,QSsh::SftpOverwriteExisting);
-//                this->jobLog(jobId,"Upload file local:"+localFileSystem->filePath(index)+" To remote:"+target);
-//            }
-//        }
-//    }
-//    else
-//    {
-//        QMessageBox::critical(this,"错误","上传到根目录是不允许的");
-//    }
+    if(remoteDir.startsWith(homeDir))
+    {
+        for(auto index:ui->localView->selectionModel()->selectedRows())
+        {
+            if(localFileSystem->isDir(index))
+            {
+//                operationLog("Upload dir.Full local path:"+localFileSystem->filePath(index)+". local dir:"+localFileSystem->fileName(index)+" To remote:"+remoteDir);
+                emit uploadDir(localFileSystem->filePath(index),localFileSystem->fileName(index),remoteDir);
+            }
+            else
+            {
+//                operationLog("Upload file.Full local path:"+localFileSystem->filePath(index)+". local file:"+localFileSystem->fileName(index)+" To remote:"+remoteDir);
+                emit uploadFile(localFileSystem->filePath(index),localFileSystem->fileName(index),remoteDir);
+            }
+        }
+    }
+    else
+    {
+        QMessageBox::critical(this,"错误",QString("上传到%1目录是不允许的").arg(remoteDir));
+    }
 }
+
 
 void MainWindow::on_pbDownload_clicked()
 {
-//    QString remoteFilePath;
-//    QString localFilePath;
-//    QSsh::SftpJobId jobId;
-//    for(auto item:ui->remoteFileSystem->selectedItems())
-//    {
-//        if(item->text(RemoteColumn::Name)=="."||item->text(RemoteColumn::Name)=="..")
-//        {
-//            continue;
-//        }
-//        remoteFilePath=remoteDir+"/"+item->text(RemoteColumn::Name);
-//        localFilePath=ui->cbLocalPath->currentText()+"/"+item->text(RemoteColumn::Name);
-//        if(item->text(RemoteColumn::Type)=="目录")
-//        {
-//            jobId=m_channel->downloadDir(remoteFilePath,localFilePath,QSsh::SftpOverwriteExisting);
-//            this->jobLog(jobId,"Download directory remote:"+remoteFilePath+" To  local:"+localFilePath);
-//        }
-//        else
-//        {
-//            jobId=m_channel->downloadFile(remoteFilePath,localFilePath,QSsh::SftpOverwriteExisting);
-//            this->jobLog(jobId,"Download file remote:"+remoteFilePath+" To  local:"+localFilePath);
-//        }
-
-//    }
+    for(auto item:ui->remoteFileSystem->selectedItems())
+    {
+        if(item->text(item->columnCount()-1)=="."||item->text(item->columnCount()-1)=="..")
+        {
+            continue;
+        }
+        if(item->text(0).startsWith('d'))
+        {
+//            operationLog("download dir:"+item->text(item->columnCount()-1));
+            emit downloadDir(item->text(item->columnCount()-1),ui->cbLocalPath->currentText());
+        }
+        else
+        {
+//            operationLog("download file:"+item->text(item->columnCount()-1));
+            emit downloadFile(item->text(item->columnCount()-1),ui->cbLocalPath->currentText());
+        }
+    }
 }
 
-//void MainWindow::jobLog( QSsh::SftpJobId jobId,QString jobName)
-//{
-//    if (jobId != QSsh::SftpInvalidJob)
-//    {
-//        ui->operationLog->appendPlainText("Starting job "+QString("%1: ").arg(jobId)+jobName);
-//    }
-//    else
-//    {
-//        ui->operationLog->appendPlainText("Invalid job "+QString("%1: ").arg(jobId)+jobName);
-//    }
-//}
+
+
+

@@ -17,19 +17,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     main.cpp \
-    src/logindialog.cpp \
-    src/mainwindow.cpp
+    src/mainwindow.cpp \
+    src/sftpclient.cpp
 
 INCLUDEPATH += include/
 
 
 HEADERS += \
-    include/logindialog.h \
-    include/mainwindow.h
+    include/common.h \
+    include/mainwindow.h \
+    include/sftpclient.h
 
-#LIBS+= ./lib/libcrypto.a ./lib/libssl.a
-LIBS += -L./lib -lcrypto -L./lib -lssl
-
+LIBS += -L./lib -lssl -lcrypto ./lib/libssh2-1.dll -lwsock32
+#LIBS += .\lib\libcrypto.a .\lib\libssl.a
 FORMS += \
     res/logindialog.ui \
     res/mainwindow.ui
@@ -42,6 +42,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     res/Icon.qrc
 
-DISTFILES += \
-    res/parent.png \
-    res/up.png
+DISTFILES +=
