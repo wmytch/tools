@@ -40,6 +40,8 @@ private slots:
 
     void on_btnTcpSend_clicked();
 
+    void on_btmCapature_clicked();
+
 private:
     Ui::MainWindow *ui;
 

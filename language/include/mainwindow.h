@@ -4,8 +4,8 @@
 #include <QMainWindow>
 //#include <QtCharts>
 #include <QMediaPlayer>
-#include <QMediaPlaylist>
-#include <QAudioDeviceInfo>
+//#include <QMediaPlaylist>
+#include <QAudioDevice>
 #include <QAudioInput>
 #include <QAudioOutput>
 #include "datahandler.h"
@@ -16,7 +16,7 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-using namespace QtCharts;
+//using namespace QtCharts;
 
 class MainWindow : public QMainWindow
 {
@@ -24,16 +24,16 @@ class MainWindow : public QMainWindow
 private:
     QMediaPlayer *player;
 //    Player *player;
-    QMediaPlaylist *playlist;
+//    QMediaPlaylist *playlist;
     QString totalDuration;
     QString currentPosition;
 
     QAudioInput *recorder{nullptr};
 //    QAudioOutput *audioOutput{nullptr};
 
-    QList<QAudioDeviceInfo> deviceList;
+    QList<QAudioDevice> deviceList;
 
-    QAudioDeviceInfo currentDevice;
+    QAudioDevice currentDevice;
     QAudioFormat settings;
 
     const qint64 waveChartPoints=4000;
@@ -47,7 +47,7 @@ private:
     void initChart(QChartView *chartView,QLineSeries *series,QString title);
 
 private slots:
-    void onStateChanged(QMediaPlayer::State state);
+    void onPlaybackStateChanged(QMediaPlayer::PlaybackState playState);
     void onPlayListChanged(int pos);
     void onDurationChanged(qint64 duration);
     void onPositionChanged(qint64 pos);

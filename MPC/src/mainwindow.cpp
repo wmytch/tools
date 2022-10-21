@@ -1,6 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QMediaCaptureSession>
+#include <QMediaRecorder>
+#include <QAudioInput>
+#include <QMediaDevices>
+#include <QAudioDevice>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -120,3 +126,35 @@ void MainWindow::on_btnTcpSend_clicked()
         emit tcpSend(ui->editTextData->text());
     }
 }
+
+void MainWindow::on_btmCapature_clicked()
+{
+
+    for(auto &audioInput:QMediaDevices::audioInputs())
+    {
+        qDebug()<<audioInput.description();
+    }
+
+    QMediaCaptureSession session;
+    QAudioInput audioInput{QMediaDevices::audioInputs().at(0)};
+    session.setAudioInput(&audioInput);
+    QMediaRecorder recorder;
+    session.setRecorder(&recorder);
+    recorder.setQuality(QMediaRecorder::HighQuality);
+    recorder.setOutputLocation(QUrl::fromLocalFile("./test.mp3"));
+    ui->statusbar->showMessage(recorder.outputLocation().toLocalFile());
+    static bool start=false;
+    if(!start)
+    {
+        start=true;
+        ui->btmCapature->setText("Stop");
+        recorder.record();
+    }
+    else
+    {
+        start=false;
+        recorder.stop();
+        ui->btmCapature->setText("Capture");
+    }
+}
+

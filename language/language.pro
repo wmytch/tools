@@ -14,20 +14,20 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
+INCLUDEPATH+= include
 SOURCES += \
-    datahandler.cpp \
-    main.cpp \
-    mainwindow.cpp \
-    player.cpp
+    src/datahandler.cpp \
+    src/main.cpp \
+    src/mainwindow.cpp \
+    src/player.cpp
 
 HEADERS += \
-    datahandler.h \
-    mainwindow.h \
-    player.h
+    include/datahandler.h \
+    include/mainwindow.h \
+    include/player.h \
 
 FORMS += \
-    mainwindow.ui
+    res/mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -35,4 +35,18 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    Icon.qrc
+    res/Icon.qrc
+
+DISTFILES += \
+    res/icon/backward.png \
+    res/icon/finish.png \
+    res/icon/forward.png \
+    res/icon/mute.png \
+    res/icon/open.png \
+    res/icon/pause.png \
+    res/icon/play.png \
+    res/icon/record.png \
+    res/icon/rewind.png \
+    res/icon/save.png \
+    res/icon/sound.png \
+    res/icon/stop.png

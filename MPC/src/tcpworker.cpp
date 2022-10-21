@@ -14,7 +14,7 @@ void TcpWorker::doConnect(const QString &addr,int port)
    connect(tcpSocket,&QTcpSocket::connected,this,&TcpWorker::onSocketConnected);
    connect(tcpSocket,&QTcpSocket::disconnected,this,&TcpWorker::onSocketDisconnected);
    connect(tcpSocket,&QTcpSocket::readyRead,this,&TcpWorker::doRecv);
-   connect(tcpSocket,QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error),this,&TcpWorker::onSocketError);
+//   connect(tcpSocket,QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error),this,&TcpWorker::onSocketError);
    tcpSocket->connectToHost(addr,port);
 }
 void  TcpWorker::doDisconnect()

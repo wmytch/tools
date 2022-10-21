@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network
 
@@ -14,20 +14,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+INCLUDEPATH += include/
 
 SOURCES += \
-    main.cpp \
-    mainwindow.cpp \
-    tcpclient.cpp \
-    tcpworker.cpp
+    src/main.cpp \
+    src/mainwindow.cpp \
+    src/tcpclient.cpp \
+    src/tcpthreads.cpp \
+    src/tcpworker.cpp \
 
 HEADERS += \
-    mainwindow.h \
-    tcpclient.h \
-    tcpworker.h
+    include/mainwindow.h \
+    include/tcpclient.h \
+    include/tcpthreads.h \
+    include/tcpworker.h \
 
 FORMS += \
-    mainwindow.ui
+    res/mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
